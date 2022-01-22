@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="$(RuntimeIdentifier.Contains('win'))">
+        <DefineConstants>Windows</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(RuntimeIdentifier.Contains('linux'))">
+        <DefineConstants>Linux</DefineConstants>
+    </PropertyGroup>
+    
+</Project>
