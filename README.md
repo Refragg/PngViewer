@@ -14,7 +14,7 @@ This implementation doesn't include everything that the PNG format supports, but
 First, you want to build the PngParser project, go to the PngParser directory in a terminal.  
   
 Since it is doing compile time OS checking to get the correct zlib library name, you want to specify your [target RID](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog) in the build command like this:
-`dotnet build -r linux-x64`
+`dotnet build -r linux-x64` or for windows: `dotnet build -r win-x64`
 
 If you get the warning CS0626 then the RID is probably not supported by the platform checking code, you can try removing that code and hardcoding your library name (in PngParser/PngParser.cs at the top of the PngParser class)
 
