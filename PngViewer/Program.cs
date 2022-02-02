@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using PngParser;
 using static PngParser.PngParser;
@@ -12,7 +13,6 @@ namespace PngViewer
     class Program
     {
         private static IntPtr window;
-        private static IntPtr renderer;
         
         static void Main(string[] args)
         {
@@ -45,22 +45,13 @@ namespace PngViewer
                     window = SDL_CreateWindow("PngViewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, (int)header.Width,
                         (int)header.Height, SDL_WindowFlags.SDL_WINDOW_OPENGL);
                     
-                    renderer = SDL_CreateRenderer(window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+                    IntPtr windowSurfacePointer = SDL_GetWindowSurface(window);
 
                     SDL_ShowWindow(window);
 
-                    SDL_RenderClear(renderer);
+                    WritePixelsToSurface(pixels, windowSurfacePointer, header);
 
-                    for (short i = 0; i < pixels.Length; i++)
-                    {
-                        for (short j = 0; j < pixels[i].Length; j++)
-                        {
-                            PngPixel pixel = pixels[i][j];
-                            pixelRGBA(renderer, j, i, (byte)pixel.Red, (byte)pixel.Green, (byte)pixel.Blue, (byte)pixel.Alpha);
-                        }
-                    }
-                    
-                    SDL_RenderPresent(renderer);
+                    SDL_UpdateWindowSurface(window);
                     
                     sw.Stop();
                     
@@ -93,6 +84,34 @@ namespace PngViewer
                 Console.WriteLine("Incorrect file path");
                 Environment.Exit(1);
             }
+        }
+
+        private static unsafe void WritePixelsToSurface(in PngPixel[][] pixels, IntPtr surface, ImageHeaderChunk header)
+        {
+            SDL_Surface windowSurface = Marshal.PtrToStructure<SDL_Surface>(surface);
+
+            uint pixelFormat = Marshal.PtrToStructure<SDL_PixelFormat>(windowSurface.format).format;
+
+            if (pixelFormat != SDL_PIXELFORMAT_RGB888)
+                throw new NotImplementedException($"Writing pixels to a surface with a pixel format of {SDL_GetPixelFormatName(pixelFormat)} is not implemented");
+            
+            byte* pixelsPointer = (byte*)windowSurface.pixels.ToPointer();
+
+            int lineByteLength = windowSurface.pitch;
+
+            for (uint y = 0; y < windowSurface.h; y++)
+            {
+                for (uint x = 0; x < windowSurface.w; x++)
+                {
+                    PngPixel pixel = pixels[y][x];
+
+                    ((uint*)pixelsPointer)[x] = SDL_MapRGBA(windowSurface.format, (byte)pixel.Red, (byte)pixel.Green, (byte)pixel.Blue, (byte)pixel.Alpha);
+                }
+                
+                pixelsPointer += lineByteLength;
+            }
+
+            Marshal.StructureToPtr(windowSurface, surface, true);
         }
     }
 }

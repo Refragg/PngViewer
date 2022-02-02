@@ -5,7 +5,7 @@
 
 ## What it is
 This is a very simple image viewer that supports PNG images.  
-It uses [zlib](http://www.zlib.net/) to decompress the data contained in the image, [SDL2](https://www.libsdl.org/index.php) and [SDL2_gfx](https://www.ferzkopp.net/wordpress/2016/01/02/sdl_gfx-sdl2_gfx/) to display the image on the screen.  
+It uses [zlib](http://www.zlib.net/) to decompress the data contained in the image and [SDL2](https://www.libsdl.org/index.php) to display the image on the screen.  
   
 The main goal of this was to explore how to parse the data inside a PNG image so the data processing part is self made using the [PNG Specification](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html).  
 This implementation doesn't include everything that the PNG format supports, but it is a start and works for a bunch of image types

@@ -349,6 +349,8 @@ namespace PngParser
             byte[] uncompressedBytes = new byte[destinationSize];
             
             Marshal.Copy(destinationPointer, uncompressedBytes, 0, (int)destinationSize);
+            
+            Marshal.FreeHGlobal(destinationPointer);
 
             return (true, uncompressedBytes);
         }
