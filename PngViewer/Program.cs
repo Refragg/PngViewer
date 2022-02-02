@@ -25,7 +25,14 @@ namespace PngViewer
             if (File.Exists(args[0]))
             {
                 Stopwatch sw = Stopwatch.StartNew();
-                (StatusCode status, PngPixel[][] pixels, ImageHeaderChunk header) = Parse(File.OpenRead(args[0]));
+
+                StatusCode status;
+                PngPixel[][] pixels;
+                ImageHeaderChunk header;
+                
+                using (FileStream fileStream = File.OpenRead(args[0]))
+                    (status, pixels, header) = Parse(fileStream);
+                
                 sw.Stop();
                 
                 if (status == StatusCode.None)
